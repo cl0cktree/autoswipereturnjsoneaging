@@ -146,8 +146,6 @@ $(function(){
 					// tend=event.originalEvent.touches[0].pageX;
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
-					mswidth = $('.slide').each(Array).length;
-					dragmove = (slideNum/mswidth-(tstart-tmove))/(mswidth*100);
 
 					//stop_s();
 					//stop_bar();
@@ -184,14 +182,17 @@ $(function(){
 						move=move-100/100;
 						bi=1+move/100*-1;
 						slideNum = $('.slide-container').css('left').replace('px', '');
+						mswidth = $('.slide').each(Array).length;
+						dragmove = (slideNum/mswidth-(tstart-tmove))/100;
 
 						if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
 						{
 							//$('.slide-container').stop().animate({'left':move+'%'},100)
-							$('.slide-container').stop().animate({'left':dragmove-move+'%'},100);
+							$('.slide-container').stop().animate({'left':move-dragmove+'%'},100);
 							//$('#prev-btn').css({'z-index':'2'})
 							//$('.bulet').css({'color':'#ccc'})
 							//$('#bulet'+bi).css({'color':'#999'})
+							console.log('here left = '+dragmove);
 							if (move-100==-mswidth*100)
 							{
 								$(this).css({'z-index':'-1'})
@@ -219,7 +220,7 @@ $(function(){
 							//$('#next-btn').css({'z-index':'2'})
 							//$('.bulet').css({'color':'#ccc'})
 							//$('#bulet'+bi).css({'color':'#999'})
-							console.log('here left = '+dragmove);
+							console.log('here right = '+dragmove);
 							if (move==0)
 							{
 								$(this).css({'z-index':'-1'})
@@ -300,12 +301,12 @@ $(function(){
 							console.log('1-1');
 						}else{
 							mswidth = $('.slide').each(Array).length;
-							dragmove = (slideNum/mswidth)-(tstart-tmove);
+							dragmove = (slideNum/mswidth-(tstart-tmove))/100;
 							if(tstart-tmove>0){
-								$('.slide-container').stop().animate({'left':move-(tstart-tmove)+'%'},100)
+								$('.slide-container').stop().animate({'left':move-dragmove+'%'},100)
 								console.log('0-0 '+$('.slide-container').css('left')+' -=- '+dragmove);
 							}else if(tstart-tmove<0){
-								$('.slide-container').stop().animate({'left':move+(tstart-tmove)+'%'},100)
+								$('.slide-container').stop().animate({'left':move+dragmove+'%'},100)
 								console.log('0-1 '+$('.slide-container').css('left')+' -=- '+dragmove);
 							}else if(tstart-tmove==0){
 								if(yvalue==0){
