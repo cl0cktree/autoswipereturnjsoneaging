@@ -39,12 +39,12 @@ $(function(){
 			$('#prev-btn').on('mouseover mouseout click',function(){
 				if (event.type=='mouseover')
 				{
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 				}else if (event.type=='mouseout')
 				{
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 				else if (event.type='click')
 				{
@@ -76,12 +76,12 @@ $(function(){
 			$('#next-btn').on('mouseover mouseout click',function(){
 				if (event.type=='mouseover')
 				{
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 				}else if (event.type=='mouseout')
 				{
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 
 				else if (event.type='click')
@@ -126,8 +126,9 @@ $(function(){
 				// var tend;
 				// var tcancel;
 
-				var cal_width = s_width*0.2;
+				var cal_width = s_width*1;
 				var cal_height = msheight*0.2;
+				var dragmove;
 
 				/*swipe 이벤트 시작*/
 				if (event.type=='touchstart')
@@ -136,8 +137,8 @@ $(function(){
 					event.stopPropagation();
 					tstart=event.originalEvent.touches[0].pageX;
 					ystart=event.originalEvent.touches[0].pageY;
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 				}
 				else if (event.type=='touchmove'){
 					event.preventDefault();
@@ -145,9 +146,11 @@ $(function(){
 					// tend=event.originalEvent.touches[0].pageX;
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
+					mswidth = $('.slide').each(Array).length;
+					dragmove = (slideNum/mswidth-(tstart-tmove))/(mswidth*100);
 
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum;
@@ -175,17 +178,17 @@ $(function(){
 						event.preventDefault();
 						event.stopPropagation();
 
-						stop_s();
-						stop_bar();
+						//stop_s();
+						//stop_bar();
 
 						move=move-100/100;
 						bi=1+move/100*-1;
-						slideNum = $('.slide-container').css('left').replace('px', '')%100;
+						slideNum = $('.slide-container').css('left').replace('px', '');
 
 						if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
 						{
 							//$('.slide-container').stop().animate({'left':move+'%'},100)
-							$('.slide-container').stop().animate({'left':slideNum-(tstart-tmove)+'px'},100);
+							$('.slide-container').stop().animate({'left':dragmove-move+'%'},100);
 							//$('#prev-btn').css({'z-index':'2'})
 							//$('.bulet').css({'color':'#ccc'})
 							//$('#bulet'+bi).css({'color':'#999'})
@@ -202,8 +205,8 @@ $(function(){
 						event.preventDefault();
 						event.stopPropagation();
 
-						stop_s();
-						stop_bar();
+						//stop_s();
+						//stop_bar();
 
 						move=move+100;
 						bi=1+move/100*-1;
@@ -211,28 +214,30 @@ $(function(){
 
 						if (move<100)
 						{
-							//$('.slide-container').stop().animate({'left':move+'%'},100)
-							$('.slide-container').stop().animate({'left':slideNum+(tstart-tmove)+'px'},100);
+							//$('.slide-container').stop().animate({'left':move+'%'},100);
+							$('.slide-container').stop().animate({'left':move-dragmove+'%'},100);
 							//$('#next-btn').css({'z-index':'2'})
 							//$('.bulet').css({'color':'#ccc'})
 							//$('#bulet'+bi).css({'color':'#999'})
+							console.log('here left = '+dragmove);
 							if (move==0)
 							{
 								$(this).css({'z-index':'-1'})
 							}
 						}else{
 							move=0;
-							//$('.slide-container').stop().animate({'left':move+'%'},100)
-							$('.slide-container').stop().animate({'left':slideNum-(tstart-tmove)+'px'},100);
+							//$('.slide-container').stop().animate({'left':move+'%'},100);
+							$('.slide-container').stop().animate({'left':move-dragmove+'%'},100);
 							$('#next-btn').css({'z-index':'2'})
+							console.log('here right = '+dragmove);
 							if (move==0)
 							{
 								$(this).css({'z-index':'-1'})
 							}
 						}
 					}
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 				else if (event.type=='touchend')
 				{
@@ -242,8 +247,8 @@ $(function(){
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
 
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
@@ -252,7 +257,7 @@ $(function(){
 					{
 						var tvalue = cal_width;
 
-						$('#next-btn').stop().click();
+						//$('#next-btn').stop().click();
 						//alert('1-1 = '+tvalue+'/ 1-2 = '+cal_width);
 
 						//move=move-100;
@@ -262,7 +267,7 @@ $(function(){
 						//move=move+100;
 						var tvalue = cal_width;
 
-						$('#prev-btn').stop().click();
+						//$('#prev-btn').stop().click();
 						//alert('2-1 = '+tvalue+'/ 2-2 = '+cal_width);
 
 
@@ -294,14 +299,14 @@ $(function(){
 							}
 							console.log('1-1');
 						}else{
+							mswidth = $('.slide').each(Array).length;
+							dragmove = (slideNum/mswidth)-(tstart-tmove);
 							if(tstart-tmove>0){
-								$('.slide-container').stop().animate({'left':slideNum+(tstart-tmove)+'px'},100);
-								$('.slide-container').stop().animate({'left':move+'%'},100)
-								console.log('0-0 '+$('.slide-container').css('left')+' -=- '+slideNum);
+								$('.slide-container').stop().animate({'left':move-(tstart-tmove)+'%'},100)
+								console.log('0-0 '+$('.slide-container').css('left')+' -=- '+dragmove);
 							}else if(tstart-tmove<0){
-								$('.slide-container').stop().animate({'left':slideNum+(tstart-tmove)+'px'},100);
-								$('.slide-container').stop().animate({'left':move+'%'},100)
-								console.log('0-1 '+$('.slide-container').css('left')+' -=- '+slideNum);
+								$('.slide-container').stop().animate({'left':move+(tstart-tmove)+'%'},100)
+								console.log('0-1 '+$('.slide-container').css('left')+' -=- '+dragmove);
 							}else if(tstart-tmove==0){
 								if(yvalue==0){
 									if($(this).is('#slide1')==true){
@@ -355,8 +360,8 @@ $(function(){
 
 					}
 
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 
 				else if (event.type=='touchcancle')
@@ -365,8 +370,8 @@ $(function(){
 					event.stopPropagation();
 					// tend=event.originalEvent.touches[0].pageX;
 
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 
@@ -414,8 +419,8 @@ $(function(){
 							}
 						}
 					}
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 				else if (event.type=='click')
 				{
@@ -446,13 +451,13 @@ $(function(){
 				}
 				else if (event.type=='mouseover')
 				{
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 				}
 				else if (event.type=='mouseleave')
 				{
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 				return false;
 			});
@@ -520,12 +525,12 @@ $(function(){
 				}
 				if (event.type=='mouseover')
 				{
-					stop_s();
-					stop_bar();
+					//stop_s();
+					//stop_bar();
 				}else if (event.type=='mouseleave')
 				{
-					start_s();
-					startbar();
+					//start_s();
+					//startbar();
 				}
 			});
 
@@ -616,8 +621,8 @@ $(function(){
 
 				},autospeed)
 			}
-			start_s();
-			startbar();
+			//start_s();
+			//startbar();
 			function stop_s(){
 				clearInterval(interval);
 			}
