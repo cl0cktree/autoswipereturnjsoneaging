@@ -179,20 +179,27 @@ $(function(){
 						//stop_s();
 						//stop_bar();
 
-						move=move-100/100;
 						bi=1+move/100*-1;
 						slideNum = $('.slide-container').css('left').replace('px', '');
 						mswidth = $('.slide').each(Array).length;
 						dragmove = (slideNum/mswidth-(tstart-tmove))/100;
 
-						if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
+						if (move>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
 						{
 							//$('.slide-container').stop().animate({'left':move+'%'},100)
-							$('.slide-container').stop().animate({'left':move-dragmove+'%'},100);
+							if(tstart-tmove>0){
+								move=move-100/100;
+								$('.slide-container').stop().animate({'left':move+dragmove+'%'},100);
+								console.log('here left1 = '+move+dragmove);
+							}else{
+								move=move-100/100*-1;
+								$('.slide-container').stop().animate({'left':move+dragmove+'%'},100);
+								console.log('here left2 = '+move+dragmove);
+							}
 							//$('#prev-btn').css({'z-index':'2'})
 							//$('.bulet').css({'color':'#ccc'})
 							//$('#bulet'+bi).css({'color':'#999'})
-							console.log('here left = '+dragmove);
+
 							if (move-100==-mswidth*100)
 							{
 								$(this).css({'z-index':'-1'})
