@@ -2,6 +2,7 @@ $(function(){
 	var mswidth;
 	var msheight;
 	var wrapwidth;
+	var dragindex;
 	if($('body').find('.slide-wrap'))
 		{
 		$('.slide-wrap').append('<div id="slide-container" class="slide-container"></div><ul id="indicator" class="indicator"></ul><div id="prev-btn" class="con-btn"></div><div id="next-btn" class="con-btn"></div>');
@@ -26,6 +27,7 @@ $(function(){
 			s_width = $('.slide').width();
 			var move=0;
 			var bi=0;
+			var bc;
 
 			$(window).resize(function(){
 				var msheight = $('.slide img').height();
@@ -35,6 +37,67 @@ $(function(){
 
 				$('.slide-wrap').css({'height':msheight});
 			});
+
+			function nextBtn(){
+				move=move-100;
+				bi=1+move/100*-1;
+				var test = $('.slide').index(this);
+				var text = String(move);
+				var last = text.substr(text.length-2);
+				var first = text.substr(text.length-2,text.length-3);
+				console.log(test);
+				if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
+				{
+					last='00';
+					text=(first+last)*-1;
+					bc=Math.floor((text/100)*-1)+1;
+					console.log('first = '+first+' /last  = '+last+' / move = '+move+' / text = '+text);
+					//$('.slide-container').stop().animate({'left':move+'%'},100);
+					$('.slide-container').stop().animate({'left':text+'%'},100);
+					$('#prev-btn').css({'z-index':'2'})
+					$('.bulet').css({'color':'#ccc'})
+					$('#bulet'+bc).css({'color':'#999'})
+					console.log('bc = '+bc);
+					if (text-100==-mswidth*100)
+					{
+						$('#next-btn').css({'z-index':'-1'})
+					}
+				}else{
+					text=-mswidth*100+100;
+				}
+			};
+
+			function prevBtn(){
+				move=move+100;
+				bi=1+move/100*-1;
+				var text = String(move);
+				var last = text.substr(text.length-2);
+				var first = text.substr(text.length-2,text.length-3);
+				if (text<100)
+				{
+					last='00';
+					text=(first+last)*-1;
+					bc=Math.floor((text/100)*-1)+1;
+					//$('.slide-container').stop().animate({'left':move+'%'},100);
+					$('.slide-container').stop().animate({'left':text+'%'},100);
+					$('#next-btn').css({'z-index':'2'})
+					$('.bulet').css({'color':'#ccc'})
+					$('#bulet'+bc).css({'color':'#999'})
+					if (text==0)
+					{
+						$('#prev-btn').css({'z-index':'-1'})
+					}
+				}else{
+					text=0;
+					//$('.slide-container').stop().animate({'left':move+'%'},100);
+					$('.slide-container').stop().animate({'left':text+'%'},100);
+					$('#next-btn').css({'z-index':'2'})
+					if (text==0)
+					{
+						$('#prev-btn').css({'z-index':'-1'})
+					}
+				}
+			};
 
 			$('#prev-btn').on('mouseover mouseout click',function(){
 				if (event.type=='mouseover')
@@ -48,28 +111,7 @@ $(function(){
 				}
 				else if (event.type='click')
 				{
-					move=move+100;
-					bi=1+move/100*-1;
-
-					if (move<100)
-					{
-						$('.slide-container').stop().animate({'left':move+'%'},100)
-						$('#next-btn').css({'z-index':'2'})
-						$('.bulet').css({'color':'#ccc'})
-						$('#bulet'+bi).css({'color':'#999'})
-						if (move==0)
-						{
-							$(this).css({'z-index':'-1'})
-						}
-					}else{
-						move=0;
-						$('.slide-container').stop().animate({'left':move+'%'},100)
-						$('#next-btn').css({'z-index':'2'})
-						if (move==0)
-						{
-							$(this).css({'z-index':'-1'})
-						}
-					}
+					prevBtn();
 				}
 			});
 
@@ -86,22 +128,7 @@ $(function(){
 
 				else if (event.type='click')
 				{
-					move=move-100;
-					bi=1+move/100*-1;
-
-					if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
-					{
-						$('.slide-container').stop().animate({'left':move+'%'},100)
-						$('#prev-btn').css({'z-index':'2'})
-						$('.bulet').css({'color':'#ccc'})
-						$('#bulet'+bi).css({'color':'#999'})
-						if (move-100==-mswidth*100)
-						{
-							$(this).css({'z-index':'-1'})
-						}
-					}else{
-						move=-mswidth*100+100;
-					}
+					nextBtn();
 				}
 
 			});
@@ -126,7 +153,7 @@ $(function(){
 				// var tend;
 				// var tcancel;
 
-				var cal_width = s_width*1;
+				var cal_width = s_width*0.3;
 				var cal_height = msheight*0.2;
 				var dragmove;
 
@@ -202,7 +229,7 @@ $(function(){
 
 							if (move-100==-mswidth*100)
 							{
-								$(this).css({'z-index':'-1'})
+								move=-mswidth*100;
 							}
 						}else{
 							move=-mswidth*100+100;
@@ -230,7 +257,7 @@ $(function(){
 							console.log('here right = '+dragmove);
 							if (move==0)
 							{
-								$(this).css({'z-index':'-1'})
+								$('#prev-btn').css({'z-index':'-1'})
 							}
 						}else{
 							move=0;
@@ -240,7 +267,7 @@ $(function(){
 							console.log('here right = '+dragmove);
 							if (move==0)
 							{
-								$(this).css({'z-index':'-1'})
+								$('#prev-btn').css({'z-index':'-1'})
 							}
 						}
 					}
@@ -260,12 +287,14 @@ $(function(){
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
+					dragindex = $('.slide').index(this)*-100;
+					$('.slide-container').css({'left':dragindex+'%'});
 
 					if (tvalue>cal_width)
 					{
 						var tvalue = cal_width;
-
-						//$('#next-btn').stop().click();
+						nextBtn();
+						console.log('N = '+dragindex);
 						//alert('1-1 = '+tvalue+'/ 1-2 = '+cal_width);
 
 						//move=move-100;
@@ -274,13 +303,15 @@ $(function(){
 					{
 						//move=move+100;
 						var tvalue = cal_width;
-
-						//$('#prev-btn').stop().click();
+						prevBtn();
+						console.log('P = '+dragindex);
 						//alert('2-1 = '+tvalue+'/ 2-2 = '+cal_width);
 
 
 					}else if (tstart-tmove<cal_width){
-
+						dragindex = $('.slide').index(this)*-100;
+						console.log(dragindex);
+						$('.slide-container').stop().animate({'left':dragindex+'%'},100);
 						if(slideNum==true){
 							if(yvalue==0){
 								if($(this).is('#slide1')==true){
@@ -308,64 +339,38 @@ $(function(){
 							console.log('1-1');
 						}else{
 							mswidth = $('.slide').each(Array).length;
-							dragmove = (slideNum/mswidth-(tstart-tmove))/100;
-							if(tstart-tmove>0){
-								$('.slide-container').stop().animate({'left':move-dragmove+'%'},100)
-								console.log('0-0 '+$('.slide-container').css('left')+' -=- '+dragmove);
-							}else if(tstart-tmove<0){
-								$('.slide-container').stop().animate({'left':move+dragmove+'%'},100)
-								console.log('0-1 '+$('.slide-container').css('left')+' -=- '+dragmove);
-							}else if(tstart-tmove==0){
-								if(yvalue==0){
-									if($(this).is('#slide1')==true){
-										$('body').css({'background':'red'})
-									}else if($(this).is('#slide2')==true){
-										$('body').css({'background':'orange'})
-									}else if($(this).is('#slide3')==true){
-										$('body').css({'background':'yellow'})
-									}else if($(this).is('#slide4')==true){
-										$('body').css({'background':'green'})
-									}else if($(this).is('#slide5')==true){
-										$('body').css({'background':'blue'})
-									}else if($(this).is('#slide6')==true){
-										$('body').css({'background':'purple'})
-									}
-								}else{
-									if(yvalue>cal_height){
-										$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
-									}else if(yvalue<cal_height){
-										if((yvalue*-1)>cal_height){
+							if (move>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
+							{
+								console.log(tstart-tmove);
+								if(tstart-tmove==0){
+									if(yvalue==0){
+										if($(this).is('#slide1')==true){
+											$('body').css({'background':'red'})
+										}else if($(this).is('#slide2')==true){
+											$('body').css({'background':'orange'})
+										}else if($(this).is('#slide3')==true){
+											$('body').css({'background':'yellow'})
+										}else if($(this).is('#slide4')==true){
+											$('body').css({'background':'green'})
+										}else if($(this).is('#slide5')==true){
+											$('body').css({'background':'blue'})
+										}else if($(this).is('#slide6')==true){
+											$('body').css({'background':'purple'})
+										}
+									}else{
+										if(yvalue>cal_height){
 											$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+										}else if(yvalue<cal_height){
+											if((yvalue*-1)>cal_height){
+												$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+											}
 										}
 									}
 								}
+							}else{
+								move=-mswidth*100+100;
 							}
 						}
-
-						// if(yvalue==0){
-						// 	if($(this).is('#slide1')==true){
-						// 		$('body').css({'background':'red'})
-						// 	}else if($(this).is('#slide2')==true){
-						// 		$('body').css({'background':'orange'})
-						// 	}else if($(this).is('#slide3')==true){
-						// 		$('body').css({'background':'yellow'})
-						// 	}else if($(this).is('#slide4')==true){
-						// 		$('body').css({'background':'green'})
-						// 	}else if($(this).is('#slide5')==true){
-						// 		$('body').css({'background':'blue'})
-						// 	}else if($(this).is('#slide6')==true){
-						// 		$('body').css({'background':'purple'})
-						// 	}
-						// }else{
-						// 	if(yvalue>cal_height){
-						// 		$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
-						// 	}else if(yvalue<cal_height){
-						// 		if((yvalue*-1)>cal_height){
-						// 			$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
-						// 		}
-						// 	}
-						// }
-
 					}
 
 					//start_s();
@@ -377,17 +382,22 @@ $(function(){
 					event.preventDefault();
 					event.stopPropagation();
 					// tend=event.originalEvent.touches[0].pageX;
+					tmove=event.originalEvent.changedTouches[0].pageX;
+					ymove=event.originalEvent.changedTouches[0].pageY;
 
 					//stop_s();
 					//stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
+					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
+					dragindex = $('.slide').index(this)*-100;
+					$('.slide-container').css({'left':dragindex+'%'});
 
 					if (tvalue>cal_width)
 					{
 						var tvalue = cal_width;
-
-						$('#next-btn').stop().click();
+						nextBtn();
+						console.log('N = '+dragindex);
 						//alert('1-1 = '+tvalue+'/ 1-2 = '+cal_width);
 
 						//move=move-100;
@@ -396,66 +406,74 @@ $(function(){
 					{
 						//move=move+100;
 						var tvalue = cal_width;
-
-						$('#prev-btn').stop().click();
+						prevBtn();
+						console.log('P = '+dragindex);
 						//alert('2-1 = '+tvalue+'/ 2-2 = '+cal_width);
 
-
 					}else if (tstart-tmove<cal_width){
-
-						if(yvalue==0){
-							if($(this).is('#slide1')==true){
-								$('body').css({'background':'red'})
-							}else if($(this).is('#slide2')==true){
-								$('body').css({'background':'orange'})
-							}else if($(this).is('#slide3')==true){
-								$('body').css({'background':'yellow'})
-							}else if($(this).is('#slide4')==true){
-								$('body').css({'background':'green'})
-							}else if($(this).is('#slide5')==true){
-								$('body').css({'background':'blue'})
-							}else if($(this).is('#slide6')==true){
-								$('body').css({'background':'purple'})
-							}
-						}else{
-							if(yvalue>cal_height){
-								$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
-							}else if(yvalue<cal_height){
-								if((yvalue*-1)>cal_height){
-									$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+						dragindex = $('.slide').index(this)*-100;
+						console.log(dragindex);
+						$('.slide-container').stop().animate({'left':dragindex+'%'},100);
+						if(slideNum==true){
+							if(yvalue==0){
+								if($(this).is('#slide1')==true){
+									$('body').css({'background':'red'})
+								}else if($(this).is('#slide2')==true){
+									$('body').css({'background':'orange'})
+								}else if($(this).is('#slide3')==true){
+									$('body').css({'background':'yellow'})
+								}else if($(this).is('#slide4')==true){
+									$('body').css({'background':'green'})
+								}else if($(this).is('#slide5')==true){
+									$('body').css({'background':'blue'})
+								}else if($(this).is('#slide6')==true){
+									$('body').css({'background':'purple'})
 								}
+							}else{
+								if(yvalue>cal_height){
+									$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+								}else if(yvalue<cal_height){
+									if((yvalue*-1)>cal_height){
+										$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+									}
+								}
+							}
+							console.log('1-1');
+						}else{
+							mswidth = $('.slide').each(Array).length;
+							if (move>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
+							{
+								console.log(tstart-tmove);
+								if(tstart-tmove==0){
+									if(yvalue==0){
+										if($(this).is('#slide1')==true){
+											$('body').css({'background':'red'})
+										}else if($(this).is('#slide2')==true){
+											$('body').css({'background':'orange'})
+										}else if($(this).is('#slide3')==true){
+											$('body').css({'background':'yellow'})
+										}else if($(this).is('#slide4')==true){
+											$('body').css({'background':'green'})
+										}else if($(this).is('#slide5')==true){
+											$('body').css({'background':'blue'})
+										}else if($(this).is('#slide6')==true){
+											$('body').css({'background':'purple'})
+										}
+									}else{
+										if(yvalue>cal_height){
+											$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+										}else if(yvalue<cal_height){
+											if((yvalue*-1)>cal_height){
+												$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+											}
+										}
+									}
+								}
+							}else{
+								move=-mswidth*100+100;
 							}
 						}
 					}
-					//start_s();
-					//startbar();
-				}
-				else if (event.type=='click')
-				{
-					if($(this).is('#slide1')==true){
-						$('body').css({'background':'red'})
-					}else if($(this).is('#slide2')==true){
-						$('body').css({'background':'orange'})
-					}else if($(this).is('#slide3')==true){
-						$('body').css({'background':'yellow'})
-					}else if($(this).is('#slide4')==true){
-						$('body').css({'background':'green'})
-					}else if($(this).is('#slide5')==true){
-						$('body').css({'background':'blue'})
-					}else if($(this).is('#slide6')==true){
-						$('body').css({'background':'purple'})
-					}else if($(this).is('#slide7')==true){
-						$('body').css({'background':'gray'})
-					}else if($(this).is('#slide8')==true){
-						$('body').css({'background':'black'})
-					}
-					// if (bi==0)
-					// {
-					// 	bi++;
-					// 	alert('click'+bi)
-					// }else{
-					// 	alert('click'+bi)
-					// }
 				}
 				else if (event.type=='mouseover')
 				{
