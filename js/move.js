@@ -28,6 +28,9 @@ $(function(){
 			var move=0;
 			var bi=0;
 			var bc;
+			var text;
+			var pre;
+			var next;
 
 			$(window).resize(function(){
 				var msheight = $('.slide img').height();
@@ -41,59 +44,51 @@ $(function(){
 			function nextBtn(){
 				move=move-100;
 				bi=1+move/100*-1;
-				var test = $('.slide').index(this);
-				var text = String(move);
-				var last = text.substr(text.length-2);
-				var first = text.substr(text.length-2,text.length-3);
-				console.log(test);
+				text = Math.floor((move/100)*-1);
+				next = text*-100;
 				if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
 				{
-					last='00';
-					text=(first+last)*-1;
-					bc=Math.floor((text/100)*-1)+1;
-					console.log('first = '+first+' /last  = '+last+' / move = '+move+' / text = '+text);
-					//$('.slide-container').stop().animate({'left':move+'%'},100);
-					$('.slide-container').stop().animate({'left':text+'%'},100);
+					bc=text+1;
+					console.log('next  = '+next+' / move = '+move+' / text = '+text);
+					$('.slide-container').stop().animate({'left':next+'%'},100);
 					$('#prev-btn').css({'z-index':'2'})
 					$('.bulet').css({'color':'#ccc'})
 					$('#bulet'+bc).css({'color':'#999'})
 					console.log('bc = '+bc);
-					if (text-100==-mswidth*100)
+					if (move-100==-mswidth*100)
 					{
-						$('#next-btn').css({'z-index':'-1'})
+						next=(mswidth-1)*-100;
+						$('#next-btn').css({'z-index':'-1'});
 					}
 				}else{
-					text=-mswidth*100+100;
+					move=-mswidth*100+100;
 				}
 			};
 
 			function prevBtn(){
 				move=move+100;
 				bi=1+move/100*-1;
-				var text = String(move);
-				var last = text.substr(text.length-2);
-				var first = text.substr(text.length-2,text.length-3);
+				var text = Math.floor((move/100)*-1);
+				pre = text*-100;
 				if (text<100)
 				{
-					last='00';
-					text=(first+last)*-1;
-					bc=Math.floor((text/100)*-1)+1;
-					//$('.slide-container').stop().animate({'left':move+'%'},100);
-					$('.slide-container').stop().animate({'left':text+'%'},100);
+					bc=text+1;
+					$('.slide-container').stop().animate({'left':pre+'%'},100);
 					$('#next-btn').css({'z-index':'2'})
 					$('.bulet').css({'color':'#ccc'})
 					$('#bulet'+bc).css({'color':'#999'})
-					if (text==0)
+					if (pre<=0)
 					{
+						pre = 0;
 						$('#prev-btn').css({'z-index':'-1'})
 					}
 				}else{
-					text=0;
-					//$('.slide-container').stop().animate({'left':move+'%'},100);
-					$('.slide-container').stop().animate({'left':text+'%'},100);
+					move=0;
+					$('.slide-container').stop().animate({'left':pre+'%'},100);
 					$('#next-btn').css({'z-index':'2'})
-					if (text==0)
+					if (pre<=0)
 					{
+						pre = 0;
 						$('#prev-btn').css({'z-index':'-1'})
 					}
 				}
@@ -102,12 +97,12 @@ $(function(){
 			$('#prev-btn').on('mouseover mouseout click',function(){
 				if (event.type=='mouseover')
 				{
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 				}else if (event.type=='mouseout')
 				{
-					//start_s();
-					//startbar();
+					start_s();
+					startbar();
 				}
 				else if (event.type='click')
 				{
@@ -118,12 +113,12 @@ $(function(){
 			$('#next-btn').on('mouseover mouseout click',function(){
 				if (event.type=='mouseover')
 				{
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 				}else if (event.type=='mouseout')
 				{
-					//start_s();
-					//startbar();
+					start_s();
+					startbar();
 				}
 
 				else if (event.type='click')
@@ -164,8 +159,8 @@ $(function(){
 					event.stopPropagation();
 					tstart=event.originalEvent.touches[0].pageX;
 					ystart=event.originalEvent.touches[0].pageY;
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 				}
 				else if (event.type=='touchmove'){
 					event.preventDefault();
@@ -174,37 +169,19 @@ $(function(){
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
 
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum;
 
-					if (tvalue>cal_width)
-					{
-						// var tvalue = cal_width;
-
-						// $('#next-btn').stop().click();
-						//alert('1-1 = '+tvalue+'/ 1-2 = '+cal_width);
-
-						//move=move-100;
-
-					}else if (tvalue<-cal_width)
-					{
-						//move=move+100;
-						// var tvalue = cal_width;
-
-						// $('#prev-btn').stop().click();
-						//alert('2-1 = '+tvalue+'/ 2-2 = '+cal_width);
-
-
-					}else if (tstart-tmove<cal_width){
+					if (tstart-tmove<cal_width){
 
 						event.preventDefault();
 						event.stopPropagation();
 
-						//stop_s();
-						//stop_bar();
+						stop_s();
+						stop_bar();
 
 						bi=1+move/100*-1;
 						slideNum = $('.slide-container').css('left').replace('px', '');
@@ -240,8 +217,8 @@ $(function(){
 						event.preventDefault();
 						event.stopPropagation();
 
-						//stop_s();
-						//stop_bar();
+						stop_s();
+						stop_bar();
 
 						move=move+100;
 						bi=1+move/100*-1;
@@ -271,8 +248,8 @@ $(function(){
 							}
 						}
 					}
-					//start_s();
-					//startbar();
+					start_s();
+					startbar();
 				}
 				else if (event.type=='touchend')
 				{
@@ -282,8 +259,8 @@ $(function(){
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
 
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
@@ -293,21 +270,34 @@ $(function(){
 					if (tvalue>cal_width)
 					{
 						var tvalue = cal_width;
-						nextBtn();
-						console.log('N = '+dragindex);
-						//alert('1-1 = '+tvalue+'/ 1-2 = '+cal_width);
-
-						//move=move-100;
-
+						$('#next-btn').stop().click();
+						if (move-100==-mswidth*100)
+						{
+							next=(mswidth-1)*-100;
+							bc=((next/100)*-1)+1;
+							$('.slide-container').stop().animate({'left':next+'%'},100);
+							stop_s();
+							stop_bar();
+							$('#next-btn').css({'z-index':'-1'});
+							$('.bulet').css({'color':'#ccc'});
+							$('#bulet'+bc).css({'color':'#999'});
+							console.log(bc+' / '+next);
+						}
 					}else if (tvalue<-cal_width)
 					{
-						//move=move+100;
 						var tvalue = cal_width;
-						prevBtn();
-						console.log('P = '+dragindex);
-						//alert('2-1 = '+tvalue+'/ 2-2 = '+cal_width);
-
-
+						$('#prev-btn').stop().click();
+						if (dragindex<=0)
+						{
+							pre = 0;
+							$('.slide-container').stop().animate({'left':pre+'%'},100);
+							stop_s();
+							stop_bar();
+							$('#prev-btn').css({'z-index':'-1'});
+							$('.bulet').css({'color':'#ccc'});
+							$('#bulet1').css({'color':'#999'});
+							console.log(dragindex+' / '+pre);
+						}
 					}else if (tstart-tmove<cal_width){
 						dragindex = $('.slide').index(this)*-100;
 						console.log(dragindex);
@@ -373,8 +363,8 @@ $(function(){
 						}
 					}
 
-					//start_s();
-					//startbar();
+					start_s();
+					startbar();
 				}
 
 				else if (event.type=='touchcancle')
@@ -385,8 +375,8 @@ $(function(){
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
 
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
@@ -396,20 +386,34 @@ $(function(){
 					if (tvalue>cal_width)
 					{
 						var tvalue = cal_width;
-						nextBtn();
-						console.log('N = '+dragindex);
-						//alert('1-1 = '+tvalue+'/ 1-2 = '+cal_width);
-
-						//move=move-100;
-
+						$('#next-btn').stop().click();
+						if (move-100==-mswidth*100)
+						{
+							next=(mswidth-1)*-100;
+							bc=((next/100)*-1)+1;
+							$('.slide-container').stop().animate({'left':next+'%'},100);
+							stop_s();
+							stop_bar();
+							$('#next-btn').css({'z-index':'-1'});
+							$('.bulet').css({'color':'#ccc'});
+							$('#bulet'+bc).css({'color':'#999'});
+							console.log(bc+' / '+next);
+						}
 					}else if (tvalue<-cal_width)
 					{
-						//move=move+100;
 						var tvalue = cal_width;
-						prevBtn();
-						console.log('P = '+dragindex);
-						//alert('2-1 = '+tvalue+'/ 2-2 = '+cal_width);
-
+						$('#prev-btn').stop().click();
+						if (dragindex<=0)
+						{
+							pre = 0;
+							$('.slide-container').stop().animate({'left':pre+'%'},100);
+							stop_s();
+							stop_bar();
+							$('#prev-btn').css({'z-index':'-1'});
+							$('.bulet').css({'color':'#ccc'});
+							$('#bulet1').css({'color':'#999'});
+							console.log(dragindex+' / '+pre);
+						}
 					}else if (tstart-tmove<cal_width){
 						dragindex = $('.slide').index(this)*-100;
 						console.log(dragindex);
@@ -477,13 +481,13 @@ $(function(){
 				}
 				else if (event.type=='mouseover')
 				{
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 				}
 				else if (event.type=='mouseleave')
 				{
-					//start_s();
-					//startbar();
+					start_s();
+					startbar();
 				}
 				return false;
 			});
@@ -526,7 +530,6 @@ $(function(){
 									$('.slide-container').stop().animate({'left':0+'%'},100)
 								}else if (move-cbm==-100)
 								{
-
 									$('.slide-container').stop().animate({'left':-cbm+100+'%'},100)
 
 									if (cb==1)
@@ -551,12 +554,12 @@ $(function(){
 				}
 				if (event.type=='mouseover')
 				{
-					//stop_s();
-					//stop_bar();
+					stop_s();
+					stop_bar();
 				}else if (event.type=='mouseleave')
 				{
-					//start_s();
-					//startbar();
+					start_s();
+					startbar();
 				}
 			});
 
@@ -615,6 +618,7 @@ $(function(){
 					{
 						console.log(mswidth-1+' -=- '+move);
 						move=0;
+						pre=0;
 						m=move*-1;
 						bi=1+move/100;
 					}else{
@@ -639,7 +643,6 @@ $(function(){
 							$('#prev-btn').css({'z-index':'2'})
 							$('#next-btn').css({'z-index':'-1'})
 						}
-
 					}else if (move>msminus){
 						$('#prev-btn').css({'z-index':'2'})
 						$('#next-btn').css({'z-index':'-1'})
@@ -647,8 +650,8 @@ $(function(){
 
 				},autospeed)
 			}
-			//start_s();
-			//startbar();
+			start_s();
+			startbar();
 			function stop_s(){
 				clearInterval(interval);
 			}
