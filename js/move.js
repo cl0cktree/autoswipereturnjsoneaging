@@ -46,22 +46,44 @@ $(function(){
 				bi=1+move/100*-1;
 				text = Math.floor((move/100)*-1);
 				next = text*-100;
-				if (move>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
+				if (next+100>-mswidth*100)/*슬라이드 갯수 최대치 자동 연산*/
 				{
 					bc=text+1;
 					console.log('next  = '+next+' / move = '+move+' / text = '+text);
 					$('.slide-container').stop().animate({'left':next+'%'},100);
-					$('#prev-btn').css({'z-index':'2'})
+					$('#prev-btn').css({'z-index':'2'});
+					$('#next-btn').css({'z-index':'2'});
 					$('.bulet').css({'color':'#ccc'})
 					$('#bulet'+bc).css({'color':'#999'})
 					console.log('bc = '+bc);
-					if (move-100==-mswidth*100)
+					if ((move-100==-mswidth*100)||(move-100<-mswidth*100))
 					{
-						next=(mswidth-1)*-100;
+						move=100;
+						//next=(mswidth-1)*-100;
 						$('#next-btn').css({'z-index':'-1'});
+					}else if(move>=0){
+						console.log('here = '+move);
+						move=0;
+						next=0;
+						$('.slide-container').stop().animate({'left':next+'%'},100);
+						$('#next-btn').css({'z-index':'2'})
+						if (next<=0)
+						{
+							next = 0;
+							$('#prev-btn').css({'z-index':'-1'})
+						}
 					}
-				}else{
-					move=-mswidth*100+100;
+				}else if(next>=0){
+					console.log('here = '+move);
+					move=0;
+					next=0;
+					$('.slide-container').stop().animate({'left':next+'%'},100);
+					$('#next-btn').css({'z-index':'2'})
+					if (next<=0)
+					{
+						next = 0;
+						$('#prev-btn').css({'z-index':'-1'})
+					}
 				}
 			};
 
@@ -70,7 +92,7 @@ $(function(){
 				bi=1+move/100*-1;
 				var text = Math.floor((move/100)*-1);
 				pre = text*-100;
-				if (text<100)
+				if (pre<100)
 				{
 					bc=text+1;
 					$('.slide-container').stop().animate({'left':pre+'%'},100);
@@ -83,7 +105,7 @@ $(function(){
 						$('#prev-btn').css({'z-index':'-1'})
 					}
 				}else{
-					move=0;
+					pre=0;
 					$('.slide-container').stop().animate({'left':pre+'%'},100);
 					$('#next-btn').css({'z-index':'2'})
 					if (pre<=0)
@@ -190,7 +212,6 @@ $(function(){
 
 						if (move>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
 						{
-							//$('.slide-container').stop().animate({'left':move+'%'},100)
 							if(tstart-tmove>0){
 								move=move-100/100;
 								$('.slide-container').stop().animate({'left':move+dragmove+'%'},100);
@@ -200,9 +221,6 @@ $(function(){
 								$('.slide-container').stop().animate({'left':move+dragmove+'%'},100);
 								console.log('here left2 = '+move+dragmove);
 							}
-							//$('#prev-btn').css({'z-index':'2'})
-							//$('.bulet').css({'color':'#ccc'})
-							//$('#bulet'+bi).css({'color':'#999'})
 
 							if (move-100==-mswidth*100)
 							{
@@ -276,8 +294,6 @@ $(function(){
 							next=(mswidth-1)*-100;
 							bc=((next/100)*-1)+1;
 							$('.slide-container').stop().animate({'left':next+'%'},100);
-							stop_s();
-							stop_bar();
 							$('#next-btn').css({'z-index':'-1'});
 							$('.bulet').css({'color':'#ccc'});
 							$('#bulet'+bc).css({'color':'#999'});
@@ -287,12 +303,10 @@ $(function(){
 					{
 						var tvalue = cal_width;
 						$('#prev-btn').stop().click();
-						if (dragindex<=0)
+						if (dragindex>=0)
 						{
 							pre = 0;
 							$('.slide-container').stop().animate({'left':pre+'%'},100);
-							stop_s();
-							stop_bar();
 							$('#prev-btn').css({'z-index':'-1'});
 							$('.bulet').css({'color':'#ccc'});
 							$('#bulet1').css({'color':'#999'});
@@ -392,8 +406,6 @@ $(function(){
 							next=(mswidth-1)*-100;
 							bc=((next/100)*-1)+1;
 							$('.slide-container').stop().animate({'left':next+'%'},100);
-							stop_s();
-							stop_bar();
 							$('#next-btn').css({'z-index':'-1'});
 							$('.bulet').css({'color':'#ccc'});
 							$('#bulet'+bc).css({'color':'#999'});
@@ -403,12 +415,10 @@ $(function(){
 					{
 						var tvalue = cal_width;
 						$('#prev-btn').stop().click();
-						if (dragindex<=0)
+						if (dragindex>=0)
 						{
 							pre = 0;
 							$('.slide-container').stop().animate({'left':pre+'%'},100);
-							stop_s();
-							stop_bar();
 							$('#prev-btn').css({'z-index':'-1'});
 							$('.bulet').css({'color':'#ccc'});
 							$('#bulet1').css({'color':'#999'});
@@ -478,6 +488,8 @@ $(function(){
 							}
 						}
 					}
+					start_s();
+					startbar();
 				}
 				else if (event.type=='mouseover')
 				{
@@ -610,43 +622,44 @@ $(function(){
 							// console.log(msheight);
 						});
 					}
-					msswipe = mswidth*100;
-					msminus = mswidth*-100+100;
-					var m;
-					var maxq=(mswidth-1)*-100;
-					if (move==msminus&&move>0||move<=maxq)
-					{
-						console.log(mswidth-1+' -=- '+move);
-						move=0;
-						pre=0;
-						m=move*-1;
-						bi=1+move/100;
-					}else{
-						move=move-100;
-						m=move*-1;
-						bi=1+m/100;
-					}
-					if (move<msswipe)
-					{
-						$('#prev-btn').css({'z-index':'2'})
-						$('#next-btn').css({'z-index':'2'})
-						$('.bulet').css({'color':'#ccc'})
-						$('#bulet'+bi).css({'color':'#999'})
-						$('.slide-container').stop().animate({'left':move+'%'},100)
-						if (move==0)
-						{
-							$('#prev-btn').css({'z-index':'-1'})
-							$('#next-btn').css({'z-index':'2'})
-						}
-						if (move-msminus==0)
-						{
-							$('#prev-btn').css({'z-index':'2'})
-							$('#next-btn').css({'z-index':'-1'})
-						}
-					}else if (move>msminus){
-						$('#prev-btn').css({'z-index':'2'})
-						$('#next-btn').css({'z-index':'-1'})
-					}
+					// msswipe = mswidth*100;
+					// msminus = mswidth*-100+100;
+					// var m;
+					// var maxq=(mswidth-1)*-100;
+					// if (move==msminus&&move>0||move<=maxq)
+					// {
+					// 	console.log(mswidth-1+' -=- '+move);
+					// 	move=0;
+					// 	pre=0;
+					// 	m=move*-1;
+					// 	bi=1+move/100;
+					// }else{
+					// 	move=move-100;
+					// 	m=move*-1;
+					// 	bi=1+m/100;
+					// }
+					// if (move<msswipe)
+					// {
+					// 	$('#prev-btn').css({'z-index':'2'})
+					// 	$('#next-btn').css({'z-index':'2'})
+					// 	$('.bulet').css({'color':'#ccc'})
+					// 	$('#bulet'+bi).css({'color':'#999'})
+					// 	$('.slide-container').stop().animate({'left':move+'%'},100)
+					// 	if (move==0)
+					// 	{
+					// 		$('#prev-btn').css({'z-index':'-1'})
+					// 		$('#next-btn').css({'z-index':'2'})
+					// 	}
+					// 	if (move-msminus==0)
+					// 	{
+					// 		$('#prev-btn').css({'z-index':'2'})
+					// 		$('#next-btn').css({'z-index':'-1'})
+					// 	}
+					// }else if (move>msminus){
+					// 	$('#prev-btn').css({'z-index':'2'})
+					// 	$('#next-btn').css({'z-index':'-1'})
+					// }
+					nextBtn();
 
 				},autospeed)
 			}
