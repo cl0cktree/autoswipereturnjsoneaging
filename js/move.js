@@ -48,13 +48,13 @@ $(function(){
 				bi=1+move/100*-1;
 				text = Math.floor((move/100)*-1);
 				next = text*-100;
+				$('#prev-btn').css({'z-index':'-1'});
+				$('#next-btn').css({'z-index':'2'});
 				if (next+100>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
 				{
 					bc=text+1;
 					console.log('next  = '+next+' / move = '+move+' / text = '+text);
 					$('.slide-container').stop().animate({'left':next+'%'},100);
-					$('#prev-btn').css({'z-index':'2'});
-					$('#next-btn').css({'z-index':'2'});
 					$('.bulet').css({'color':'#ccc'})
 					$('#bulet'+bc).css({'color':'#999'})
 					console.log('bc = '+bc);
@@ -62,22 +62,31 @@ $(function(){
 					{
 						move=100;
 						//next=(mswidth-1)*-100;
+						$('#prev-btn').css({'z-index':'2'});
 						$('#next-btn').css({'z-index':'-1'});
-					}else if(move>=0){
+						console.log('11111111111111111111')
+					}else if(move>100){
 						console.log('here = '+move);
 						move=0;
 						next=0;
 						$('.slide-container').stop().animate({'left':next+'%'},100);
-						$('#next-btn').css({'z-index':'2'})
 						$('#prev-btn').css({'z-index':'-1'})
+						$('#next-btn').css({'z-index':'2'})
+						console.log('222222222222222222222')
 						if (next>=0)
 						{
 							next = 0;
+							console.log('333333333333333333333')
 							$('#prev-btn').css({'z-index':'-1'})
+							$('#next-btn').css({'z-index':'2'})
 						}
+					}else if(next<0&&next>mswidth*-100){
+						$('#prev-btn').css({'z-index':'2'});
+						$('#next-btn').css({'z-index':'2'});
 					}
 				}else if(next>=0){
 					console.log('here = '+move);
+					console.log('44444444444444444444444');
 					move=0;
 					next=0;
 					$('.slide-container').stop().animate({'left':next+'%'},100);
@@ -87,6 +96,8 @@ $(function(){
 					{
 						next = 0;
 						$('#prev-btn').css({'z-index':'-1'})
+						$('#next-btn').css({'z-index':'2'})
+						console.log('5555555555555555555555')
 					}
 				}
 			};
@@ -119,6 +130,10 @@ $(function(){
 					}
 				}
 			};
+
+			function stop_next(){
+				clearTimeout(nextBtn);
+			}
 
 			$('#prev-btn').on('mouseover mouseout click',function(){
 				if (event.type=='mouseover')
@@ -229,11 +244,7 @@ $(function(){
 
 						if (move<100)
 						{
-							//$('.slide-container').stop().animate({'left':move+'%'},100);
 							$('.slide-container').stop().animate({'left':move-dragmove+'%'},100);
-							//$('#next-btn').css({'z-index':'2'})
-							//$('.bulet').css({'color':'#ccc'})
-							//$('#bulet'+bi).css({'color':'#999'})
 							console.log('here right = '+dragmove);
 							if (move==0)
 							{
@@ -261,15 +272,14 @@ $(function(){
 					// tend=event.originalEvent.touches[0].pageX;
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
-
+					stop_next();
 					stop_s();
 					stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
+					var max_drag = (mswidth-1)*-100;
 					dragindex = $('.slide').index(this)*-100;
-					$('.slide-container').css({'left':dragindex+'%'});
-
 					if (tvalue>cal_width)
 					{
 						var tvalue = cal_width;
@@ -279,21 +289,46 @@ $(function(){
 							next=(mswidth-1)*-100;
 							bc=((next/100)*-1)+1;
 							function move_oevr(){
-								stop_s();
-								stop_bar();
+								setTimeout(stop_next,0);
+								setTimeout(stop_next,0);
+								setTimeout(stop_s,0);
 								move=100;
+								if (next>=mswidth*-100)
+								{
+									event.preventDefault();
+									event.stopPropagation();
+									move=100;
+									setTimeout(stop_next,0);
+									setTimeout(stop_s,0);
+									setTimeout(stop_bar,0);
+									setTimeout(startbar,0);
+									$('.slide-container').stop().animate({'left':next+'%'},100);
+									if(move==100&&next<-100){
+										move=100;
+										console.log('===========reset============1 - '+next);
+										event.preventDefault();
+										event.stopPropagation();
+										setTimeout(stop_next,0);
+										setTimeout(stop_s,0);
+										setTimeout(stop_bar,0);
+										setTimeout(startbar,0);
+										setTimeout(start_s,autospeed);
+									}
+								}
+								else{
+									move=100;
+									setTimeout(stop_next,0);
+									setTimeout(stop_s,0);
+									setTimeout(stop_bar,0);
+									$('.slide-container').stop().animate({'left':next+'%'},100);
+									console.log('===========reset============2')
+								}
 							};
-							$('.slide-container').stop().animate({'left':next+'%'},100);
-							$('#next-btn').css({'z-index':'-1'});
-							$('.bulet').css({'color':'#ccc'});
-							$('#bulet'+bc).css({'color':'#999'});
 							setTimeout(move_oevr,0);
-							if(move>=0){
-								setTimeout(startbar,autospeed);
-								setTimeout(start_s,autospeed);
-							}
+							tvalue=0;
 							console.log('bc = '+bc+' / next = '+next+' / move = '+move);
-						}else{
+						}
+						else{
 							$('#next-btn').stop().click();
 						}
 					}else if (tvalue<-cal_width)
@@ -303,16 +338,53 @@ $(function(){
 						if (move>0)
 						{
 							move = 0;
+							next = 0;
 							$('.slide-container').stop().animate({'left':pre+'%'},100);
 							$('#prev-btn').css({'z-index':'-1'});
 							$('.bulet').css({'color':'#ccc'});
 							$('#bulet1').css({'color':'#999'});
+							//setTimeout(startbar,0);
+							//setTimeout(start_s,autospeed);
 							console.log(dragindex+' / '+pre);
 						}
 					}else if (tstart-tmove<cal_width){
 						dragindex = $('.slide').index(this)*-100;
-						console.log(dragindex);
 						$('.slide-container').stop().animate({'left':dragindex+'%'},100);
+						next=(mswidth-1)*-100;
+						if(next>=mswidth*-100&&move<=max_drag){
+							move = 100;
+							event.preventDefault();
+							event.stopPropagation();
+							setTimeout(stop_next,0);
+							setTimeout(stop_s,0);
+							setTimeout(stop_bar,0);
+							setTimeout(startbar,0);
+							$('.slide-container').stop().animate({'left':max_drag+'%'},100);
+							move=max_drag+100;
+							if(move>max_drag){
+								move = 100;
+								event.preventDefault();
+								event.stopPropagation();
+								setTimeout(stop_next,0);
+								setTimeout(stop_s,0);
+								setTimeout(start_s,autospeed);
+								console.log(move);
+								if(yvalue==0){
+									event.preventDefault();
+									event.stopPropagation();
+									$('body').css({'background':'purple'})//마지막 순번 click시 조건.
+								}else{
+									if(yvalue>cal_height){
+										$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+									}else if(yvalue<cal_height){
+										if((yvalue*-1)>cal_height){
+											$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+										}
+									}
+								}
+							}
+							console.log(move);
+						}
 						if(slideNum==true){
 							if(yvalue==0){
 								if($(this).is('#slide1')==true){
@@ -343,6 +415,7 @@ $(function(){
 							if (move>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
 							{
 								console.log(tstart-tmove);
+								move = 100;
 								if(tstart-tmove==0){
 									if(yvalue==0){
 										if($(this).is('#slide1')==true){
@@ -383,15 +456,14 @@ $(function(){
 					// tend=event.originalEvent.touches[0].pageX;
 					tmove=event.originalEvent.changedTouches[0].pageX;
 					ymove=event.originalEvent.changedTouches[0].pageY;
-
+					stop_next();
 					stop_s();
 					stop_bar();
 					var tvalue = tstart-tmove;
 					var yvalue = ystart-ymove;
 					var slideNum = ($('.slide-container').css('left').replace('px', ''))%100;
+					var max_drag = (mswidth-1)*-100;
 					dragindex = $('.slide').index(this)*-100;
-					$('.slide-container').css({'left':dragindex+'%'});
-
 					if (tvalue>cal_width)
 					{
 						var tvalue = cal_width;
@@ -401,21 +473,46 @@ $(function(){
 							next=(mswidth-1)*-100;
 							bc=((next/100)*-1)+1;
 							function move_oevr(){
-								stop_s();
-								stop_bar();
+								setTimeout(stop_next,0);
+								setTimeout(stop_next,0);
+								setTimeout(stop_s,0);
 								move=100;
+								if (next>=mswidth*-100)
+								{
+									event.preventDefault();
+									event.stopPropagation();
+									move=100;
+									setTimeout(stop_next,0);
+									setTimeout(stop_s,0);
+									setTimeout(stop_bar,0);
+									setTimeout(startbar,0);
+									$('.slide-container').stop().animate({'left':next+'%'},100);
+									if(move==100&&next<-100){
+										move=100;
+										console.log('===========reset============1 - '+next);
+										event.preventDefault();
+										event.stopPropagation();
+										setTimeout(stop_next,0);
+										setTimeout(stop_s,0);
+										setTimeout(stop_bar,0);
+										setTimeout(startbar,0);
+										setTimeout(start_s,autospeed);
+									}
+								}
+								else{
+									move=100;
+									setTimeout(stop_next,0);
+									setTimeout(stop_s,0);
+									setTimeout(stop_bar,0);
+									$('.slide-container').stop().animate({'left':next+'%'},100);
+									console.log('===========reset============2')
+								}
 							};
-							$('.slide-container').stop().animate({'left':next+'%'},100);
-							$('#next-btn').css({'z-index':'-1'});
-							$('.bulet').css({'color':'#ccc'});
-							$('#bulet'+bc).css({'color':'#999'});
 							setTimeout(move_oevr,0);
-							if(move>=0){
-								setTimeout(startbar,autospeed);
-								setTimeout(start_s,autospeed);
-							}
+							tvalue=0;
 							console.log('bc = '+bc+' / next = '+next+' / move = '+move);
-						}else{
+						}
+						else{
 							$('#next-btn').stop().click();
 						}
 					}else if (tvalue<-cal_width)
@@ -425,16 +522,53 @@ $(function(){
 						if (move>0)
 						{
 							move = 0;
+							next = 0;
 							$('.slide-container').stop().animate({'left':pre+'%'},100);
 							$('#prev-btn').css({'z-index':'-1'});
 							$('.bulet').css({'color':'#ccc'});
 							$('#bulet1').css({'color':'#999'});
+							//setTimeout(startbar,0);
+							//setTimeout(start_s,autospeed);
 							console.log(dragindex+' / '+pre);
 						}
 					}else if (tstart-tmove<cal_width){
 						dragindex = $('.slide').index(this)*-100;
-						console.log(dragindex);
 						$('.slide-container').stop().animate({'left':dragindex+'%'},100);
+						next=(mswidth-1)*-100;
+						if(next>=mswidth*-100&&move<=max_drag){
+							move = 100;
+							event.preventDefault();
+							event.stopPropagation();
+							setTimeout(stop_next,0);
+							setTimeout(stop_s,0);
+							setTimeout(stop_bar,0);
+							setTimeout(startbar,0);
+							$('.slide-container').stop().animate({'left':max_drag+'%'},100);
+							move=max_drag+100;
+							if(move>max_drag){
+								move = 100;
+								event.preventDefault();
+								event.stopPropagation();
+								setTimeout(stop_next,0);
+								setTimeout(stop_s,0);
+								setTimeout(start_s,autospeed);
+								console.log(move);
+								if(yvalue==0){
+									event.preventDefault();
+									event.stopPropagation();
+									$('body').css({'background':'purple'})//마지막 순번 click시 조건.
+								}else{
+									if(yvalue>cal_height){
+										$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+									}else if(yvalue<cal_height){
+										if((yvalue*-1)>cal_height){
+											$('body, html').stop().animate({ scrollTop: $("body").offset().top+yvalue },300);
+										}
+									}
+								}
+							}
+							console.log(move);
+						}
 						if(slideNum==true){
 							if(yvalue==0){
 								if($(this).is('#slide1')==true){
@@ -465,6 +599,7 @@ $(function(){
 							if (move>mswidth*-100)/*슬라이드 갯수 최대치 자동 연산*/
 							{
 								console.log(tstart-tmove);
+								move = 100;
 								if(tstart-tmove==0){
 									if(yvalue==0){
 										if($(this).is('#slide1')==true){
@@ -497,6 +632,7 @@ $(function(){
 					}
 					start_s();
 					startbar();
+					console.log('cancle_1');
 				}
 				else if (event.type=='mouseover')
 				{
@@ -513,6 +649,9 @@ $(function(){
 
 			var cb;
 			var cbm;
+			function bullet_next(){
+				setTimeout(nextBtn,autospeed);
+			}
 			$('.bulet').on('click mouseover mouseleave touchstart touchmove touchend touchcancle',function(){
 				if (event.type=='click')
 				{
@@ -540,12 +679,15 @@ $(function(){
 										$('#next-btn').css({'z-index':'2'})
 									}else if (cb==mswidth)
 									{
-										setTimeout(nextBtn,autospeed);
+										bullet_next();
+										stop_next();
 										$('#prev-btn').css({'z-index':'2'})
 										$('#next-btn').css({'z-index':'-1'})
 									}
 								}else if (move-cbm>-100){
-									$('.slide-container').stop().animate({'left':0+'%'},100)
+									$('.slide-container').stop().animate({'left':0+'%'},100);
+									$('#prev-btn').css({'z-index':'-1'})
+									$('#next-btn').css({'z-index':'2'})
 								}else if (move-cbm==-100)
 								{
 									$('.slide-container').stop().animate({'left':-cbm+100+'%'},100);
@@ -560,7 +702,8 @@ $(function(){
 										$('#next-btn').css({'z-index':'2'})
 									}else if (cb==mswidth)
 									{
-										setTimeout(nextBtn,2000);
+										bullet_next();
+										stop_next();
 										$('#prev-btn').css({'z-index':'2'})
 										$('#next-btn').css({'z-index':'-1'})
 									}
@@ -652,55 +795,17 @@ $(function(){
 				},autospeed);
 			};
 			function start_s(){
+				stop_next();
 				setTimeout(lazy_0,0);
 				interval = setInterval(function(){
 					if($('.slide-wrap').height()==0){
 						$(document).ready(function(){
 							msheight = $('.slide img').height();
 							$('.slide-wrap').css({'height':msheight});
-							// console.log(msheight);
 						});
 					}
-					// msswipe = mswidth*100;
-					// msminus = mswidth*-100+100;
-					// var m;
-					// var maxq=(mswidth-1)*-100;
-					// if (move==msminus&&move>0||move<=maxq)
-					// {
-					// 	console.log(mswidth-1+' -=- '+move);
-					// 	move=0;
-					// 	pre=0;
-					// 	m=move*-1;
-					// 	bi=1+move/100;
-					// }else{
-					// 	move=move-100;
-					// 	m=move*-1;
-					// 	bi=1+m/100;
-					// }
-					// if (move<msswipe)
-					// {
-					// 	$('#prev-btn').css({'z-index':'2'})
-					// 	$('#next-btn').css({'z-index':'2'})
-					// 	$('.bulet').css({'color':'#ccc'})
-					// 	$('#bulet'+bi).css({'color':'#999'})
-					// 	$('.slide-container').stop().animate({'left':move+'%'},100)
-					// 	if (move==0)
-					// 	{
-					// 		$('#prev-btn').css({'z-index':'-1'})
-					// 		$('#next-btn').css({'z-index':'2'})
-					// 	}
-					// 	if (move-msminus==0)
-					// 	{
-					// 		$('#prev-btn').css({'z-index':'2'})
-					// 		$('#next-btn').css({'z-index':'-1'})
-					// 	}
-					// }else if (move>msminus){
-					// 	$('#prev-btn').css({'z-index':'2'})
-					// 	$('#next-btn').css({'z-index':'-1'})
-					// }
 					nextBtn();
-
-				},autospeed)
+				},autospeed);
 			}
 			start_s();
 			startbar();
