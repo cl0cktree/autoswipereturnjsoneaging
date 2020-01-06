@@ -170,7 +170,7 @@ $(function(){
 			});
 
 			$('.slide').on('touchstart touchmove touchend touchcancle click mouseover mouseleave',function(event){
-				var cal_width = s_width*0.3;
+				var cal_width = s_width*0.6;
 				var cal_height = msheight*0.2;
 				var dragmove;
 
